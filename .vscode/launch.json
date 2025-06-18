@@ -1,0 +1,42 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    // "runtimeExecutable": "C:/Users/T9811541/AppData/Local/BraveSoftware/Brave-Browser/Application/brave.exe"
+    // "runtimeExecutable": "C:/Program Files/BraveSoftware/Brave-Browser/Application/brave.exe"
+    // 
+    "version": "0.2.0",
+    "configurations": [
+
+        {
+            "name": "Node",
+            "type": "node",
+            "program": "${workspaceFolder}/start.js",
+            "request": "launch",
+            "skipFiles": [
+                "<node_internals>/**"
+            ]          
+        },
+        {
+            "name": "Brave_Home",
+            "type": "chrome",
+            "request": "launch",
+            "url": "http://localhost:3430/meter10/index.html",
+            "userDataDir": true,
+            "webRoot": "${workspaceFolder}/web",
+            "runtimeExecutable": "C:/Program Files/BraveSoftware/Brave-Browser/Application/brave.exe"
+        }
+    ],
+
+    "compounds": [
+
+        {
+            "name": "Home: Server/Client",
+            "configurations": [
+                "Node",
+                "Brave_Home"
+            ],
+            "stopAll": true
+        }
+    ]
+}
