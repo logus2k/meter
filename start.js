@@ -29,7 +29,7 @@ const meterDirs = entries
 
 meterDirs.forEach(dir => {
   app.use(`/${dir}`, express.static(path.join(__dirname, dir)));
-  console.log(`Serving static files from /${dir}`);
+  // console.log(`Serving static files from /${dir}`);
 });
 
 // Start server
