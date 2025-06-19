@@ -327,8 +327,13 @@ export class AudioVisualizer {
 			this._drawSegmentBarHorizontal(this.width, yTop, rightWidth, barHeight, revIndex);
 			this._drawSegmentBarHorizontal(this.width, yBot, leftWidth, barHeight, i);
 
-			this.peakLevelsRight[revIndex] = Math.max(this.peakLevelsRight[revIndex] * this.PEAK_DECAY, rightLevel, this.MIN_PEAK_LEVEL);
-			this.peakLevelsLeft[i] = Math.max(this.peakLevelsLeft[i] * this.PEAK_DECAY, leftLevel, this.MIN_PEAK_LEVEL);
+			// Update peak levels with proper decay to zero
+			this.peakLevelsRight[revIndex] = Math.max(this.peakLevelsRight[revIndex] * this.PEAK_DECAY, rightLevel);
+			this.peakLevelsLeft[i] = Math.max(this.peakLevelsLeft[i] * this.PEAK_DECAY, leftLevel);
+			
+			// Set to zero if below threshold
+			if (this.peakLevelsRight[revIndex] < 1) this.peakLevelsRight[revIndex] = 0;
+			if (this.peakLevelsLeft[i] < 1) this.peakLevelsLeft[i] = 0;
 
 			const peakRight = this._enhanceScaling(this.peakLevelsRight[revIndex], this.width);
 			const peakLeft = this._enhanceScaling(this.peakLevelsLeft[i], this.width);
@@ -374,6 +379,7 @@ export class AudioVisualizer {
 	}
 
 	_drawPeakIndicator(xRight, y, peakWidth, barHeight) {
+		// Don't draw peak indicator if there's no peak or it's at zero
 		if (peakWidth <= 0 || isNaN(peakWidth)) return;
 
 		const peakOffset = 2;
