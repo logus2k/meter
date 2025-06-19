@@ -331,15 +331,35 @@ export class AudioVisualizer {
 			this.peakLevelsRight[revIndex] = Math.max(this.peakLevelsRight[revIndex] * this.PEAK_DECAY, rightLevel);
 			this.peakLevelsLeft[i] = Math.max(this.peakLevelsLeft[i] * this.PEAK_DECAY, leftLevel);
 			
-			// Set to zero if below threshold
-			if (this.peakLevelsRight[revIndex] < 1) this.peakLevelsRight[revIndex] = 0;
-			if (this.peakLevelsLeft[i] < 1) this.peakLevelsLeft[i] = 0;
+			// Apply faster decay in the final moments for more natural disappearance
+			const rightScaled = this._enhanceScaling(this.peakLevelsRight[revIndex], this.width);
+			const leftScaled = this._enhanceScaling(this.peakLevelsLeft[i], this.width);
+			
+			// When peaks are getting very small (< 10 pixels), apply faster decay
+			if (rightScaled < 10 && rightScaled > 0) {
+				this.peakLevelsRight[revIndex] *= 0.85; // Faster decay for final moments
+			}
+			if (leftScaled < 10 && leftScaled > 0) {
+				this.peakLevelsLeft[i] *= 0.85; // Faster decay for final moments
+			}
+			
+			// Recalculate after potential faster decay
+			const rightScaledFinal = this._enhanceScaling(this.peakLevelsRight[revIndex], this.width);
+			const leftScaledFinal = this._enhanceScaling(this.peakLevelsLeft[i], this.width);
+			
+			if (rightScaledFinal < 1) this.peakLevelsRight[revIndex] = 0;
+			if (leftScaledFinal < 1) this.peakLevelsLeft[i] = 0;
 
 			const peakRight = this._enhanceScaling(this.peakLevelsRight[revIndex], this.width);
 			const peakLeft = this._enhanceScaling(this.peakLevelsLeft[i], this.width);
 
-			this._drawPeakIndicator(this.width, yTop, peakRight, barHeight);
-			this._drawPeakIndicator(this.width, yBot, peakLeft, barHeight);
+			// Only draw peak indicators if they have meaningful visual width (at least 1 pixel)
+			if (peakRight > 1) {
+				this._drawPeakIndicator(this.width, yTop, peakRight, barHeight);
+			}
+			if (peakLeft > 1) {
+				this._drawPeakIndicator(this.width, yBot, peakLeft, barHeight);
+			}
 		}
 
 		this.canvasContext.restore();
